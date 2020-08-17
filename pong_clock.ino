@@ -6,9 +6,11 @@ For help on how to build the pong clock see my blog:
 http://123led.wordpress.com/
 
 Release Notes for V5.2.
+
 *shatter71's code updates to allow the screen to be turned off between certain hours each day
 *shatter71's code updates to allow the screen to be turned off during weekend
 *added upside down display flip as default
+*code tidy and small cleanups
 
 Release Notes for V5.1.
 
@@ -451,7 +453,7 @@ void ht1632_putchar(byte x, byte y, char c)
     else if (c == '>') {
         c = 30; // clock_mode selector arrow
     }
-    else if (c >= -80 && c<= -67) {
+    else if (c >= -80 && c <= -67) {
         c *= -1;
     }
 
@@ -477,7 +479,7 @@ void ht1632_putchar(byte x, byte y, char c)
 void ht1632_putbigchar(byte x, byte y, char c)
 {
     byte dots;
-    if (c >= 'A' && c <= 'Z' || (c >= 'a' && c <= 'z') ) {
+    if ( (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') ) {
         return;   //return, as the 10x14 font contains only numeric characters
     }
     if (c >= '0' && c <= '9') {
@@ -511,7 +513,7 @@ void ht1632_putbigchar(byte x, byte y, char c)
 void ht1632_puttinychar(byte x, byte y, char c)
 {
     byte dots;
-    if (c >= 'A' && c <= 'Z' || (c >= 'a' && c <= 'z') ) {
+    if ( (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') ) {
         c &= 0x1F;   // A-Z maps to 1-26
     }
     else if (c >= '0' && c <= '9') {
@@ -554,7 +556,6 @@ void digits()
 
     char buffer[3];   //for int to char conversion to turn rtc values into chars we can print on screen
     byte offset = 0;  //used to offset the x postition of the digits and centre the display when we are in 12 hour mode and the clock shows only 3 digits. e.g. 3:21
-    byte x,y;         //used to draw a clear box over the left hand "1" of the display when we roll from 12:59 -> 1:00am in 12 hour mode.
 
     //do 12/24 hour conversion if ampm set to 1
     byte hours = rtc[2];
@@ -1221,8 +1222,6 @@ void word_clock() {
     char numberstens[5][7] = {
             "ten","twenty","thirty","forty","fifty"};
 
-    byte hours_y, mins_y; //hours and mins and positions for hours and mins lines
-
     byte hours = rtc[2];
     if (hours > 12) {
         hours = hours - ampm * 12;
@@ -1691,7 +1690,6 @@ void normal() {
 
             //do seconds
             textchar[5] = ':';
-            buffer[3];
             secs = rtc[0];
             itoa(secs,buffer,10);
 
@@ -1733,9 +1731,6 @@ void normal() {
             textchar[13] = buffer[1];
             textchar[14] = suffix[s][0];
             textchar[15] = suffix[s][1];
-
-            byte x = 0;
-            byte y = 0;
 
             //print each char
             for(byte x=0; x<8 ; x++) {
@@ -2258,8 +2253,8 @@ void switch_mode() {
     //remember mode we are in. We use this value if we go into settings mode, so we can change back from settings mode (6) to whatever mode we were in.
     old_mode = clock_mode;
 
-    char* modes[] = {
-            "Normal", "Pong", "Digits", "Words", "Slide", "Jumble", "Setup"};
+    const char* modes[] = {
+            "Normal", "Pong", "Digits", "Words", "Slide", "Jumble", "Setup" };
 
     byte next_clock_mode;
     byte firstrun = 1;
@@ -2317,7 +2312,7 @@ void switch_mode() {
 //dislpay menu to change the clock settings
 void setup_menu() {
     screen_on();
-    char* set_modes[] = {
+    const char* set_modes[] = {
             "Go Back","Random","24 Hour","Set Clk","Bright","DST Adj","DrkMode","Weekend" };
     if (ampm == 0) {
         set_modes[2] = ("12 Hour");
