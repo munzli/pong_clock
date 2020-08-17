@@ -74,18 +74,17 @@ Copyrighted and distributed under the terms of the Berkely license (copy freely,
 //global variables
 static const byte ht1632_data = 10;      // Data pin for sure module
 static const byte ht1632_wrclk = 11;     // Write clock pin for sure module
-static const byte ht1632_cs[2] = {
-        4,5};  // Chip_selects one for each sure module. Remember to set the DIP switches on the modules too.
+static const byte ht1632_cs[2] = {4,5};  // Chip_selects one for each sure module. Remember to set the DIP switches on the modules too.
 
 Button buttonA = Button(2,BUTTON_PULLUP);       // Setup button A (using button library)
 Button buttonB = Button(3,BUTTON_PULLUP);       // Setup button B (using button library)
 
-RTC_DS1307 ds1307;                      //RTC object
+RTC_DS1307 ds1307;                      // RTC object
 
 int rtc[7];                             // Holds real time clock output
 byte clock_mode = 0;                    // Default clock mode. Default = 0 (normal)
 byte old_mode = clock_mode;             // Stores the previous clock mode, so if we go to date or whatever, we know what mode to go back to after.
-bool ampm = 1;                          // Define 12 or 24 hour time. 0 = 24 hour. 1 = 12 hour
+bool ampm = 0;                          // Define 12 or 24 hour time. 0 = 24 hour. 1 = 12 hour
 bool random_mode = 0;                   // Define random mode - changes the display type every few hours. Default = 0 (off)
 bool daylight_mode = 0;                 // Define if DST is on or off. Default = 0 (off).
 byte change_mode_time = 0;              // Holds hour when clock mode will next change if in random mode.
@@ -98,12 +97,9 @@ int dark_mode_active = 0;               // Track if switching LEDOFF / LEDON has
 int weekend_mode = 1;                   // Track if clock is off for the entire weekend
 int weekend_mode_active = 0;            // Track if switching LEDOFF / LEDON has occurred so the routine isn't run over and over again
 
-char days[7][4] = {
-        "Sun","Mon","Tue", "Wed", "Thu", "Fri", "Sat"}; //day array - used in slide, normal and jumble modes (The DS1307 outputs 1-7 values for day of week)
-char daysfull[7][9]={
-        "Sunday", "Monday", "Tuesday", "Wed", "Thursday", "Friday", "Saturday" };
-char suffix[4][3]={
-        "st", "nd", "rd", "th"};  //date suffix array, used in slide, normal and jumble modes. e,g, 1st 2nd ...
+char days[7][4] = {"Sun","Mon","Tue", "Wed", "Thu", "Fri", "Sat"}; //day array - used in slide, normal and jumble modes (The DS1307 outputs 1-7 values for day of week)
+char daysfull[7][9]={"Sunday", "Monday", "Tuesday", "Wed", "Thursday", "Friday", "Saturday"};
+char suffix[4][3]={"st", "nd", "rd", "th"};  //date suffix array, used in slide, normal and jumble modes. e,g, 1st 2nd ...
 
 
 //intial setup
@@ -126,7 +122,7 @@ void setup ()
 #endif
     ds1307.begin(); //start RTC Clock
 
-    if (! ds1307.isrunning()) {
+    if (!ds1307.isrunning()) {
         Serial.println("RTC is NOT running!");
         ds1307.adjust(DateTime(__DATE__, __TIME__)); // sets the RTC to the date & time this sketch was compiled
     }
@@ -1216,11 +1212,9 @@ void word_clock() {
 
     cls();
 
-    char numbers[19][10]   = {
-            "one", "two", "three", "four","five","six","seven","eight","nine","ten",
+    char numbers[19][10]   = {"one", "two", "three", "four","five","six","seven","eight","nine","ten",
             "eleven","twelve", "thirteen","fourteen","fifteen","sixteen","seventeen","eighteen","nineteen"};
-    char numberstens[5][7] = {
-            "ten","twenty","thirty","forty","fifty"};
+    char numberstens[5][7] = {"ten","twenty","thirty","forty","fifty"};
 
     byte hours = rtc[2];
     if (hours > 12) {
@@ -2077,8 +2071,7 @@ void display_date()
     byte month = rtc[5] - 1;
 
     //array of month names to print on the display. Some are shortened as we only have 8 characters across to play with
-    char monthnames[12][9]={
-            "January", "February", "March", "April", "May", "June", "July", "August", "Sept", "October", "November", "December" };
+    char monthnames[12][9]={"January", "February", "March", "April", "May", "June", "July", "August", "Sept", "October", "November", "December"};
 
     //call the flashing cursor effect for one blink at x,y pos 0,0, height 5, width 7, repeats 1
     flashing_cursor(0,0,5,7,1);
@@ -2253,8 +2246,7 @@ void switch_mode() {
     //remember mode we are in. We use this value if we go into settings mode, so we can change back from settings mode (6) to whatever mode we were in.
     old_mode = clock_mode;
 
-    const char* modes[] = {
-            "Normal", "Pong", "Digits", "Words", "Slide", "Jumble", "Setup" };
+    const char* modes[] = {"Normal", "Pong", "Digits", "Words", "Slide", "Jumble", "Setup"};
 
     byte next_clock_mode;
     byte firstrun = 1;
@@ -2312,8 +2304,7 @@ void switch_mode() {
 //dislpay menu to change the clock settings
 void setup_menu() {
     screen_on();
-    const char* set_modes[] = {
-            "Go Back","Random","24 Hour","Set Clk","Bright","DST Adj","DrkMode","Weekend" };
+    const char* set_modes[] = {"Go Back","Random","24 Hour","Set Clk","Bright","DST Adj","DrkMode","Weekend"};
     if (ampm == 0) {
         set_modes[2] = ("12 Hour");
     }
@@ -2777,8 +2768,7 @@ void set_time() {
 int set_value(byte message, int current_value, int reset_value, int rollover_limit){
 
     cls();
-    char messages[6][17]   = {
-            "Set Mins", "Set Hour", "Set Day", "Set Mnth", "Set Year"};
+    char messages[6][17]   = {"Set Mins", "Set Hour", "Set Day", "Set Mnth", "Set Year"};
 
     //Print "set xyz" top line
     byte i = 0;
